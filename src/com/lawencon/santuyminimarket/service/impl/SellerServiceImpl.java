@@ -46,7 +46,7 @@ public class SellerServiceImpl implements SellerService{
 	}
 
 	@Override
-	public int removeItemByName(List<Item> items, String name) {
+	public int getItemFieldByName(List<Item> items, String name) {
 		int takeField =0;
 		for(int i=0;i<items.size();i++) {
 			if(items.get(i).getItemName().equals(name)) {
@@ -56,6 +56,17 @@ public class SellerServiceImpl implements SellerService{
 		
 		return takeField;
 		
+	}
+
+	@Override
+	public List<Category> getNewCategory(List<Category> categories, String categoryName) {
+		final List<Category> newCategories = new ArrayList<Category>();
+		for(int i=0;i<categories.size();i++) {
+			if(!categories.get(i).getCategoryName().equals(categoryName)) {
+				newCategories.add(categories.get(i));
+			}
+		}
+		return newCategories;
 	}
 
 }

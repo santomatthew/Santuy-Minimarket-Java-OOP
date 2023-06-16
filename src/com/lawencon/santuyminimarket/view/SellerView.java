@@ -218,7 +218,7 @@ public class SellerView {
 			showDeleteItem(categoryId);
 		}
 		if(menuCode==3) {
-			
+			showEditItemCategory(categoryId);
 		}
 		if(menuCode==4) {
 			
@@ -267,12 +267,45 @@ public class SellerView {
 			}
 			final int chosenItemToDelete = ScannerUtil.scannerInt("Pilih item yang mau dihapus : ", 1, listItemByCategory.size());
 			final String getItemName = listItemByCategory.get(chosenItemToDelete-1).getItemName();
-			final int takeItemField = sellerService.removeItemByName(items, getItemName);
+			final int takeItemField = sellerService.getItemFieldByName(items, getItemName);
 			items.remove(takeItemField);
 			System.out.println("==== Response ====");
 			System.out.println("System res: (Item "+getItemName +" berhasil di hapus");
 			System.out.println("==== Response ====");
 			
+		}
+		showAllItemsByCategory(categoryId);
+	}
+	
+	//Edit Item Category
+	private void showEditItemCategory(int categoryId) {
+		final String categoryName = categories.get(categoryId).getCategoryName();
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		if(!checkItemInCategory) {
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Tidak ada item yang dapat diedit di kategori "+categoryName + " )");
+			System.out.println("==== Response ====");
+		}
+		else {
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			for(int i=0;i<listItemByCategory.size();i++) {
+				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
+			}
+			final int chosenItemToChangeCategory = ScannerUtil.scannerInt("Pilih item yang mau diganti kategorinya : ", 1, listItemByCategory.size());
+			final List<Category> newCategories = sellerService.getNewCategory(categories, categoryName);
+			for(int i=0;i<newCategories.size();i++) {
+				System.out.println((i+1)+ ". "+ newCategories.get(i).getCategoryName());
+			}
+			final int chosenNewCategory = ScannerUtil.scannerInt("Pilih kategori baru : ", 1, newCategories.size());
+			final String newCategoryName = newCategories.get(chosenNewCategory-1).getCategoryName();
+			final String chosenItemName = listItemByCategory.get(chosenItemToChangeCategory-1).getItemName();
+			final int takeItemField = sellerService.getItemFieldByName(items, chosenItemName);
+			final Item updatedItem = items.get(takeItemField);
+			updatedItem.setCategoryName(newCategoryName);
+			items.set(takeItemField, updatedItem);
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Kategori item "+chosenItemName +" telah diganti menjadi "+newCategoryName + " )");
+			System.out.println("==== Response ====");
 		}
 		
 		showAllItemsByCategory(categoryId);

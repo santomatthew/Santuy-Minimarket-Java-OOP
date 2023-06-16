@@ -10,6 +10,7 @@ public interface SellerService {
 	boolean checkCategoryIfExist(List<Category>categories, String newCategoryName);
 	boolean checkItemCategory(List<Item> items,String categoryName); 
 	List<Item> getItemByCategoryName (String categoryName,List<Item>items);
-	int removeItemByName (List<Item>items, String name);
+	int getItemFieldByName (List<Item>items, String name);
+	List<Category> getNewCategory(List<Category>categories, String categoryName);
 	
 }
