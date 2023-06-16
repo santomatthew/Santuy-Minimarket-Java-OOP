@@ -1,5 +1,7 @@
 package com.lawencon.santuyminimarket.view;
 
+import com.lawencon.santuyminimarket.util.ScannerUtil;
+
 public class BuyerView {
 
 	
@@ -11,6 +13,13 @@ public class BuyerView {
 		System.out.println("4. Checkout");
 		System.out.println("5. Switch User");
 		System.out.println("5. Keluar Aplikasi");
+		
+		final int chooseMenu = ScannerUtil.scannerInt("Pilih menu :" , 1, 5);
+		menuOption(chooseMenu);
+	}
+	
+	private void menuOption(int menuCode) {
+		
 	}
 	
 }
