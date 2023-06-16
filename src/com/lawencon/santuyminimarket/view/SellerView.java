@@ -190,9 +190,13 @@ public class SellerView {
 		}
 		else {
 			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			System.out.println("===== List Item =====");
 			for(int i=0;i<listItemByCategory.size();i++) {
-				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
+				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName()
+						+" || Harga : Rp."+ listItemByCategory.get(i).getPrice() 
+						+" || Stok : "+ listItemByCategory.get(i).getStocks());
 			}
+			System.out.println("===== List Item =====");
 		}
 		
 		System.out.println("1. Tambah Item");
@@ -208,7 +212,7 @@ public class SellerView {
 	//Item option menu
 	private void itemOption(int menuCode, int categoryId) {
 		if(menuCode==1) {
-			showAddNewItem();
+			showAddNewItem(categoryId);
 		}
 		if(menuCode==2) {
 			showDeleteItem(categoryId);
@@ -226,11 +230,9 @@ public class SellerView {
 	}
 	
 	//Add new Item
-	private void showAddNewItem() {
+	private void showAddNewItem(int categoryId) {
 		final String newItemName = ScannerUtil.scannerStr("Masukkan nama : ");
-		showCategories();
-		final int chooseCategory = ScannerUtil.scannerInt("Pilih Kategori Barang : ", 1, categories.size());
-		final String categoryName = categories.get(chooseCategory-1).getCategoryName();
+		final String categoryName = categories.get(categoryId).getCategoryName();
 		final int price = ScannerUtil.scannerNoMaximum("Masukkan harga : ", 1000);
 		final int stocks = ScannerUtil.scannerNoMaximum("Masukkan Stok :", 1);
 		final Item newItem = new Item();
@@ -238,6 +240,7 @@ public class SellerView {
 		newItem.setCategoryName(categoryName);
 		newItem.setPrice(price);
 		newItem.setStocks(stocks);
+		items.add(newItem);
 		
 		System.out.println("==== Response ====");
 		System.out.println("System res: Item "+ newItemName+ " "
@@ -245,7 +248,7 @@ public class SellerView {
 				+ " sebanyak : "+stocks 
 				+" stok berhasil ditambahkan" );
 		System.out.println("==== Response ====");
-		showAllItemsByCategory(chooseCategory-1);
+		showAllItemsByCategory(categoryId);
 	}
 	
 	//Delete Item
