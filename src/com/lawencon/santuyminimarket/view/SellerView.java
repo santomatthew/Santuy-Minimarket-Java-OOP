@@ -202,7 +202,7 @@ public class SellerView {
 		System.out.println("1. Tambah Item");
 		System.out.println("2. Hapus Item");
 		System.out.println("3. Ubah Kategori");
-		System.out.println("4. Edit Item");
+		System.out.println("4. Edit Item (Nama/Harga/Stok)");
 		System.out.println("5. Kembali");
 		final int chooseItemMenu= ScannerUtil.scannerInt("Pilih Menu : ", 1, 5);
 		itemOption(chooseItemMenu,categoryId);
@@ -221,7 +221,7 @@ public class SellerView {
 			showEditItemCategory(categoryId);
 		}
 		if(menuCode==4) {
-			
+			showEditItemOption(categoryId);
 		}
 		if(menuCode==5) {
 			showCategoryMenu();
@@ -305,6 +305,63 @@ public class SellerView {
 			items.set(takeItemField, updatedItem);
 			System.out.println("==== Response ====");
 			System.out.println("System res: (Kategori item "+chosenItemName +" telah diganti menjadi "+newCategoryName + " )");
+			System.out.println("==== Response ====");
+		}
+		showAllItemsByCategory(categoryId);
+	}
+	
+	private void showEditItemOption(int categoryId) {
+		final String categoryName = categories.get(categoryId).getCategoryName();
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		if(!checkItemInCategory) {
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Tidak ada item yang dapat diedit di kategori "+categoryName + " )");
+			System.out.println("==== Response ====");
+		}
+		else {
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			for(int i=0;i<listItemByCategory.size();i++) {
+				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
+			}
+			final int chosenItemToEditOption = ScannerUtil.scannerInt("Pilih item yang mau diedit (Nama/Harga/Stok) nya : ", 1, listItemByCategory.size());
+			System.out.println("1. Nama");
+			System.out.println("2. Harga");
+			System.out.println("3. Stok");
+			final int optionEdit = ScannerUtil.scannerInt("Pilih bagian item yang akan di edit : ", 1, 3);
+			editOptionMenu(listItemByCategory.get(chosenItemToEditOption-1),optionEdit,categoryId);
+			
+		}
+		
+	}
+	
+	private void editOptionMenu(Item chosenItem, int option, int categoryId) {
+		final int takeItemField = sellerService.getItemFieldByName(items, chosenItem.getItemName());
+		final Item newUpdatedItem = items.get(takeItemField);
+		if(option==1) {
+			//Name
+			final String newName = ScannerUtil.scannerStr("Masukkan nama baru: ");
+			newUpdatedItem.setItemName(newName);
+			items.set(takeItemField, newUpdatedItem);
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Nama item berhasil di update)");
+			System.out.println("==== Response ====");
+		}
+		else if(option==2) {
+			//price
+			final int newPrice = ScannerUtil.scannerNoMaximum("Masukkan harga baru : ", 1000);
+			newUpdatedItem.setPrice(newPrice);
+			items.set(takeItemField, newUpdatedItem);
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Harga item berhasil di update)");
+			System.out.println("==== Response ====");
+		}
+		else if(option==3) {
+			//Stock
+			final int newStocks = ScannerUtil.scannerNoMaximum("Masukkan stok baru :", 1);
+			newUpdatedItem.setStocks(newStocks);
+			items.set(takeItemField, newUpdatedItem);
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Stock item berhasil di update)");
 			System.out.println("==== Response ====");
 		}
 		
