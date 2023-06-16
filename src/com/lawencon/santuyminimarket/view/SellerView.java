@@ -165,12 +165,114 @@ public class SellerView {
 	
 	//Select Category
 	private void showSelectCategory() {
+		if(categories.size()==0) {
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Tidak ada kategori yang bisa dipilih)");
+			System.out.println("==== Response ====");
+		}
+		else {
+			showCategories();
+			final int choseCategory = ScannerUtil.scannerInt("Pilih list item berdasarkan kategori :", 1, categories.size());
+			showAllItemsByCategory(choseCategory-1);
+		}
+		
 		
 	}
 	
 	//Show All Items by Category
-	private void showAllItemsByCateogry(int categoryId) {
+	private void showAllItemsByCategory(int categoryId) {
+		final String categoryName = categories.get(categoryId).getCategoryName();
+		//line checkItemInCategory kemungkinan bug
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
 		
+		if(!checkItemInCategory) {
+			System.out.println("Item di kategori "+ categoryName+ " belum ada");
+		}
+		else {
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			for(int i=0;i<listItemByCategory.size();i++) {
+				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
+			}
+		}
+		
+		System.out.println("1. Tambah Item");
+		System.out.println("2. Hapus Item");
+		System.out.println("3. Ubah Kategori");
+		System.out.println("4. Edit Item");
+		System.out.println("5. Kembali");
+		final int chooseItemMenu= ScannerUtil.scannerInt("Pilih Menu : ", 1, 5);
+		itemOption(chooseItemMenu,categoryId);
+		
+	}
+	
+	//Item option menu
+	private void itemOption(int menuCode, int categoryId) {
+		if(menuCode==1) {
+			showAddNewItem();
+		}
+		if(menuCode==2) {
+			showDeleteItem(categoryId);
+		}
+		if(menuCode==3) {
+			
+		}
+		if(menuCode==4) {
+			
+		}
+		if(menuCode==5) {
+			showCategoryMenu();
+		}
+		
+	}
+	
+	//Add new Item
+	private void showAddNewItem() {
+		final String newItemName = ScannerUtil.scannerStr("Masukkan nama : ");
+		showCategories();
+		final int chooseCategory = ScannerUtil.scannerInt("Pilih Kategori Barang : ", 1, categories.size());
+		final String categoryName = categories.get(chooseCategory-1).getCategoryName();
+		final int price = ScannerUtil.scannerNoMaximum("Masukkan harga : ", 1000);
+		final int stocks = ScannerUtil.scannerNoMaximum("Masukkan Stok :", 1);
+		final Item newItem = new Item();
+		newItem.setItemName(newItemName);
+		newItem.setCategoryName(categoryName);
+		newItem.setPrice(price);
+		newItem.setStocks(stocks);
+		
+		System.out.println("==== Response ====");
+		System.out.println("System res: Item "+ newItemName+ " "
+				+ "dengan harga satuan Rp."+ price 
+				+ " sebanyak : "+stocks 
+				+" stok berhasil ditambahkan" );
+		System.out.println("==== Response ====");
+		showAllItemsByCategory(chooseCategory-1);
+	}
+	
+	//Delete Item
+	private void showDeleteItem(int categoryId) {
+		final String categoryName = categories.get(categoryId).getCategoryName();
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		if(!checkItemInCategory) {
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Tidak ada item yang dapat dihapus di kategori "+categoryName + " )");
+			System.out.println("==== Response ====");
+		}
+		else {
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			for(int i=0;i<listItemByCategory.size();i++) {
+				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
+			}
+			final int chosenItemToDelete = ScannerUtil.scannerInt("Pilih item yang mau dihapus : ", 1, listItemByCategory.size());
+			final String getItemName = listItemByCategory.get(chosenItemToDelete-1).getItemName();
+			final int takeItemField = sellerService.removeItemByName(items, getItemName);
+			items.remove(takeItemField);
+			System.out.println("==== Response ====");
+			System.out.println("System res: (Item "+getItemName +" berhasil di hapus");
+			System.out.println("==== Response ====");
+			
+		}
+		
+		showAllItemsByCategory(categoryId);
 	}
 	
 	//Show Histories
