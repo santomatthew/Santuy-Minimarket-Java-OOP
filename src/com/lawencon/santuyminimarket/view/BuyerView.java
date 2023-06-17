@@ -107,44 +107,46 @@ public class BuyerView {
 		else {
 			System.out.println("===== List Item Kategori "+ category.getCategoryName() +" =====");
 			for(int i=0;i<itemsByCategory.size();i++) {
-				System.out.println((i+1)+". "+ itemsByCategory.get(i).getItemName()+ " || Stocks : "+ items.get(i).getStocks());
+				System.out.println((i+1)+". "+ itemsByCategory.get(i).getItemName()+ " || Stocks : "+ itemsByCategory.get(i).getStocks());
 			}
 			
-			final int chosenItem =  ScannerUtil.scannerInt("Pilih item :", 1, itemsByCategory.size());
-			final int quantity = ScannerUtil.scannerNoMaximum("Masukkan Quantity: ", 1);
-			final Item chosen= items.get(chosenItem-1);
-			Cart cart = new Cart();
-			if(items.get(chosenItem-1).getStocks()>=quantity) {
-				final boolean checkItem = buyerService.checkItem(carts, chosen.getItemName());
-				if(checkItem) {
-					final int takeField = buyerService.takeField(carts, chosen.getItemName());
-					cart = carts.get(takeField);
-					if(chosen.getStocks()>=  quantity) {
-						chosen.setStocks(chosen.getStocks() -  quantity);
-						items.set(chosenItem-1, chosen);
-						cart.setQuantity(cart.getQuantity()+ quantity);
-						carts.set(takeField, cart);
-						System.out.println("Berhasil menambah "+quantity+" "+ chosen.getItemName() );
-					}
-					else {
-						System.out.println("Stok tidak cukup");
-						showItemsByCategory(categoryId);
-					}
-				}
-				else {
-					cart.setItemName(itemsByCategory.get(chosenItem-1).getItemName());
-					cart.setCategoryName(category.getCategoryName());
-					cart.setPrice(itemsByCategory.get(chosenItem-1).getPrice());
-					chosen.setStocks(chosen.getStocks() - quantity);
-					items.set(chosenItem-1, chosen);
-					cart.setQuantity(quantity);
-					carts.add(cart);
-					System.out.println("Berhasil membeli "+quantity+" "+ chosen.getItemName() );
-				}
+			final int chooseItem = ScannerUtil.scannerInt("Pilih item : ",1,itemsByCategory.size());
+			//Masukkan item yang dipilih ke object baru
+			final Item chosenItem = itemsByCategory.get(chooseItem-1);
+			final int maximum = chosenItem.getStocks();
+			final int quantity = ScannerUtil.scannerInt("Masukkan quantity : ", 1, maximum);
+			boolean checkItem = buyerService.checkItem(carts, chosenItem.getItemName());
+			
+			if(checkItem) {
+				//Update di cart
+				final int takeField = buyerService.takeField(carts, chosenItem.getItemName());
+				final Cart newCart = carts.get(takeField);
+				newCart.setQuantity(newCart.getQuantity() + quantity);
+				carts.set(takeField, newCart);
+				
+				//Update di Item
+				final int itemField = buyerService.getItemFieldByName(items, newCart.getItemName());
+				final Item newItem = items.get(itemField);
+				newItem.setStocks(maximum-quantity);
+				items.set(itemField, newItem);
+				
+				System.out.println("Berhasil menambah "+quantity+" "+ newCart.getItemName() );
 			}
 			else {
-				System.out.println("Quantity tidak bisa melebihi stok");
-				showItemsByCategory(categoryId);
+				final Cart newCart = new Cart();
+				newCart.setItemName(chosenItem.getItemName());
+				newCart.setCategoryName(chosenItem.getCategoryName());
+				newCart.setPrice(chosenItem.getPrice());
+				newCart.setQuantity(quantity);
+				carts.add(newCart);
+				
+				//Update di Item
+				final int itemField = buyerService.getItemFieldByName(items, newCart.getItemName());
+				final Item newItem = items.get(itemField);
+				newItem.setStocks(maximum-quantity);
+				items.set(itemField, newItem);
+				
+				System.out.println("Berhasil membeli "+quantity+" "+ newCart.getItemName() );
 			}
 		}
 		show();

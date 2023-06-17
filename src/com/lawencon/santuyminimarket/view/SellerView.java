@@ -11,12 +11,9 @@ public class SellerView {
 
 
 	private final SellerService sellerService ;
-	
-	
 	private List<Category> categories;
 	private List<Item> items;
 	private List<History> histories;
-	
 	private final MainView mainView;
 	
 	
@@ -81,8 +78,7 @@ public class SellerView {
 		System.out.println("4. Masuk ke Kategori (Untuk melihat list item berdasarkan kategori");
 		System.out.println("5. Kembali");
 		final int chooseMenu = ScannerUtil.scannerInt("Pilih Menu : ", 1, 5);
-		categoryOption(chooseMenu);
-		
+		categoryOption(chooseMenu);	
 	}
 	
 	private void categoryOption(int option) {
@@ -122,7 +118,9 @@ public class SellerView {
 			if(!categoryIdChecker) {
 				final boolean categoryChecker = sellerService.checkCategoryIfExist(categories, categoryName);
 				if(categoryChecker) {
-					System.out.println("Nama kategori sudah ada, silahkan menambahkan yang baru");
+					System.out.println("==== Response ====");
+					System.out.println("System res: (Nama kategori sudah ada, silahkan menambahkan yang baru)");
+					System.out.println("==== Response ====");
 					showAddCategory();
 				}
 				else {
@@ -137,12 +135,12 @@ public class SellerView {
 				}
 			}
 			else {
-				System.out.println("Id kategori sudah terpakai, mohon ganti yang baru");
+				System.out.println("==== Response ====");
+				System.out.println("System res: (Id kategori sudah terpakai, mohon ganti yang baru)");
+				System.out.println("==== Response ====");
 				showAddCategory();
 			}
 		}
-		
-		
 	}
 	
 	//Remove Category
@@ -157,7 +155,9 @@ public class SellerView {
 			final int chosenCategory = ScannerUtil.scannerInt("Pilih kategori yang mau dihapus : ", 1, categories.size());
 			boolean checkItemInCategory = sellerService.checkItemCategory(items, categories.get(chosenCategory-1).getCategoryId());
 			if(checkItemInCategory) {
-				System.out.println("Masih ada item yang dijual di kategori ini, hapus item terlebih dahulu sebelum menghapus kategori");
+				System.out.println("==== Response ====");
+				System.out.println("System res: (Masih ada item yang dijual di kategori ini, hapus item terlebih dahulu sebelum menghapus kategori)");
+				System.out.println("==== Response ====");
 			}
 			else {
 				categories.remove(chosenCategory-1);
@@ -165,8 +165,6 @@ public class SellerView {
 				System.out.println("System res: (Kategori berhasil di hapus)");
 				System.out.println("==== Response ====");
 			}
-			
-			
 		}
 		showCategoryMenu();
 	}
@@ -205,14 +203,12 @@ public class SellerView {
 			final int categoryId = categories.get(choseCategory-1).getCategoryId();
 			showAllItemsByCategory(categoryId);
 		}
-		
 		showCategoryMenu();
 	}
 	
 	//Show All Items by Category
 	private void showAllItemsByCategory(int categoryId) {
 		final Category category = sellerService.getCategoryById(categories, categoryId);
-		//line checkItemInCategory kemungkinan bug
 		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryId);
 		
 		if(!checkItemInCategory) {

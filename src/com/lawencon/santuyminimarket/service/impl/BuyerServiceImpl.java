@@ -53,7 +53,6 @@ public class BuyerServiceImpl implements BuyerService{
 				takeField=i;
 			}
 		}
-		
 		return takeField;
 	}
 
