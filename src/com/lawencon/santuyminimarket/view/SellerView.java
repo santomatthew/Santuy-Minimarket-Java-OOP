@@ -108,6 +108,7 @@ public class SellerView {
 	//Add Category
 	private void showAddCategory() {
 		final String categoryName = ScannerUtil.scannerStr("Masukkan nama kategori : ");
+		final int categoryId = ScannerUtil.scannerNoMaximum("Masukkan id kategori : ", 1);
 		final boolean categoryChecker = sellerService.checkCategoryIfExist(categories, categoryName);
 		if(categoryChecker) {
 			System.out.println("Nama kategori sudah ada, silahkan menambahkan yang baru");
@@ -116,6 +117,7 @@ public class SellerView {
 		else {
 			final Category newCategory = new Category();
 			newCategory.setCategoryName(categoryName);
+			newCategory.setCategoryId(categoryId);
 			categories.add(newCategory);
 			System.out.println("==== Response ====");
 			System.out.println("System res: (Sukses menambahkan kategori "+ categoryName+")");
@@ -173,7 +175,8 @@ public class SellerView {
 		else {
 			showCategories();
 			final int choseCategory = ScannerUtil.scannerInt("Pilih list item berdasarkan kategori :", 1, categories.size());
-			showAllItemsByCategory(choseCategory-1);
+			final int categoryId = categories.get(choseCategory-1).getCategoryId();
+			showAllItemsByCategory(categoryId);
 		}
 		
 		showCategoryMenu();
@@ -181,15 +184,15 @@ public class SellerView {
 	
 	//Show All Items by Category
 	private void showAllItemsByCategory(int categoryId) {
-		final String categoryName = categories.get(categoryId).getCategoryName();
+		final Category category = sellerService.getCategoryById(categories, categoryId);
 		//line checkItemInCategory kemungkinan bug
-		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryId);
 		
 		if(!checkItemInCategory) {
-			System.out.println("Item di kategori "+ categoryName+ " belum ada");
+			System.out.println("Item di kategori "+ category.getCategoryName()+ " belum ada");
 		}
 		else {
-			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryId(categoryId, items); 
 			System.out.println("===== List Item =====");
 			for(int i=0;i<listItemByCategory.size();i++) {
 				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName()
@@ -232,14 +235,15 @@ public class SellerView {
 	//Add new Item
 	private void showAddNewItem(int categoryId) {
 		final String newItemName = ScannerUtil.scannerStr("Masukkan nama : ");
-		final String categoryName = categories.get(categoryId).getCategoryName();
+		final Category category = sellerService.getCategoryById(categories, categoryId);
 		final int price = ScannerUtil.scannerNoMaximum("Masukkan harga : ", 1000);
 		final int stocks = ScannerUtil.scannerNoMaximum("Masukkan Stok :", 1);
 		final Item newItem = new Item();
 		newItem.setItemName(newItemName);
-		newItem.setCategoryName(categoryName);
+		newItem.setCategoryName(category.getCategoryName());
 		newItem.setPrice(price);
 		newItem.setStocks(stocks);
+		newItem.setItemCategoryId(categoryId);
 		items.add(newItem);
 		
 		System.out.println("==== Response ====");
@@ -253,15 +257,15 @@ public class SellerView {
 	
 	//Delete Item
 	private void showDeleteItem(int categoryId) {
-		final String categoryName = categories.get(categoryId).getCategoryName();
-		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		final Category category = sellerService.getCategoryById(categories, categoryId);
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryId);
 		if(!checkItemInCategory) {
 			System.out.println("==== Response ====");
-			System.out.println("System res: (Tidak ada item yang dapat dihapus di kategori "+categoryName + " )");
+			System.out.println("System res: (Tidak ada item yang dapat dihapus di kategori "+category.getCategoryName() + " )");
 			System.out.println("==== Response ====");
 		}
 		else {
-			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryId(categoryId, items); 
 			for(int i=0;i<listItemByCategory.size();i++) {
 				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
 			}
@@ -279,20 +283,20 @@ public class SellerView {
 	
 	//Edit Item Category
 	private void showEditItemCategory(int categoryId) {
-		final String categoryName = categories.get(categoryId).getCategoryName();
-		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		final Category category = sellerService.getCategoryById(categories, categoryId);
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryId);
 		if(!checkItemInCategory) {
 			System.out.println("==== Response ====");
-			System.out.println("System res: (Tidak ada item yang dapat diedit di kategori "+categoryName + " )");
+			System.out.println("System res: (Tidak ada item yang dapat diedit di kategori "+category.getCategoryName() + " )");
 			System.out.println("==== Response ====");
 		}
 		else {
-			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryId(categoryId, items); 
 			for(int i=0;i<listItemByCategory.size();i++) {
 				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
 			}
 			final int chosenItemToChangeCategory = ScannerUtil.scannerInt("Pilih item yang mau diganti kategorinya : ", 1, listItemByCategory.size());
-			final List<Category> newCategories = sellerService.getNewCategory(categories, categoryName);
+			final List<Category> newCategories = sellerService.getNewCategory(categories, category.getCategoryName());
 			if(newCategories.size()==0) {
 				System.out.println("==== Response ====");
 				System.out.println("System res: (Kategori tidak bisa diganti karena tidak ada kategori lain");
@@ -303,14 +307,15 @@ public class SellerView {
 					System.out.println((i+1)+ ". "+ newCategories.get(i).getCategoryName());
 				}
 				final int chosenNewCategory = ScannerUtil.scannerInt("Pilih kategori baru : ", 1, newCategories.size());
-				final String newCategoryName = newCategories.get(chosenNewCategory-1).getCategoryName();
+				final Category newCategory = newCategories.get(chosenNewCategory-1);
 				final String chosenItemName = listItemByCategory.get(chosenItemToChangeCategory-1).getItemName();
 				final int takeItemField = sellerService.getItemFieldByName(items, chosenItemName);
 				final Item updatedItem = items.get(takeItemField);
-				updatedItem.setCategoryName(newCategoryName);
+				updatedItem.setCategoryName(newCategory.getCategoryName());
+				updatedItem.setItemCategoryId(newCategory.getCategoryId());
 				items.set(takeItemField, updatedItem);
 				System.out.println("==== Response ====");
-				System.out.println("System res: (Kategori item "+chosenItemName +" telah diganti menjadi "+newCategoryName + " )");
+				System.out.println("System res: (Kategori item "+chosenItemName +" telah diganti menjadi "+newCategory.getCategoryName() + " )");
 				System.out.println("==== Response ====");
 			}
 			
@@ -319,15 +324,15 @@ public class SellerView {
 	}
 	
 	private void showEditItemOption(int categoryId) {
-		final String categoryName = categories.get(categoryId).getCategoryName();
-		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryName);
+		final Category category = sellerService.getCategoryById(categories, categoryId);
+		final boolean checkItemInCategory = sellerService.checkItemCategory(items, categoryId);
 		if(!checkItemInCategory) {
 			System.out.println("==== Response ====");
-			System.out.println("System res: (Tidak ada item yang dapat diedit di kategori "+categoryName + " )");
+			System.out.println("System res: (Tidak ada item yang dapat diedit di kategori "+category.getCategoryName() + " )");
 			System.out.println("==== Response ====");
 		}
 		else {
-			final List<Item>listItemByCategory = sellerService.getItemByCategoryName(categoryName, items); 
+			final List<Item>listItemByCategory = sellerService.getItemByCategoryId(categoryId, items); 
 			for(int i=0;i<listItemByCategory.size();i++) {
 				System.out.println((i+1)+". "+ listItemByCategory.get(i).getItemName());
 			}

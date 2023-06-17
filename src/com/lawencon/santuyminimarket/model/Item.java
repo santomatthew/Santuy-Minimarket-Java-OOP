@@ -6,6 +6,7 @@ public class Item {
 	private String categoryName;
 	private int price;
 	private int stocks;
+	private int itemCategoryId;
 
 	public String getItemName() {
 		return itemName;
@@ -37,6 +38,14 @@ public class Item {
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+	}
+
+	public int getItemCategoryId() {
+		return itemCategoryId;
+	}
+
+	public void setItemCategoryId(int itemCategoryId) {
+		this.itemCategoryId = itemCategoryId;
 	}
 
 

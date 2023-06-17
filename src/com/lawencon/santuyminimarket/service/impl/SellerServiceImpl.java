@@ -22,11 +22,11 @@ public class SellerServiceImpl implements SellerService{
 	}
 
 	@Override
-	public boolean checkItemCategory(List<Item> items,String categoryName) {
+	public boolean checkItemCategory(List<Item> items,int categoryId) {
 		boolean result = false;
 		
 		for(int i=0;i<items.size();i++) {
-			if(items.get(i).getCategoryName().equals(categoryName)) {
+			if(items.get(i).getItemCategoryId()== categoryId) {
 				result=true;
 			}
 		}
@@ -35,10 +35,10 @@ public class SellerServiceImpl implements SellerService{
 	}
 
 	@Override
-	public List<Item> getItemByCategoryName(String categoryName,List<Item> items) {
+	public List<Item> getItemByCategoryId(int categoryId,List<Item> items) {
 		final List<Item> newItems = new ArrayList<Item>();
 		for(int i=0;i<items.size();i++) {
-			if(items.get(i).getCategoryName().equals(categoryName)) {
+			if(items.get(i).getItemCategoryId() == categoryId) {
 				newItems.add(items.get(i));
 			}
 		}
@@ -67,6 +67,18 @@ public class SellerServiceImpl implements SellerService{
 			}
 		}
 		return newCategories;
+	}
+
+	@Override
+	public Category getCategoryById(List<Category> categories, int categoryId) {
+		Category chosenCategory = new Category();
+		for(int i=0;i<categories.size();i++) {
+			if(categories.get(i).getCategoryId() == categoryId) {
+				chosenCategory = categories.get(i);
+			}
+		}
+		
+		return chosenCategory;
 	}
 
 }

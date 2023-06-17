@@ -7,8 +7,10 @@ import com.lawencon.santuyminimarket.constant.Account;
 import com.lawencon.santuyminimarket.model.Category;
 import com.lawencon.santuyminimarket.model.History;
 import com.lawencon.santuyminimarket.model.Item;
+import com.lawencon.santuyminimarket.service.BuyerService;
 import com.lawencon.santuyminimarket.service.LoginService;
 import com.lawencon.santuyminimarket.service.SellerService;
+import com.lawencon.santuyminimarket.service.impl.BuyerServiceImpl;
 import com.lawencon.santuyminimarket.service.impl.LoginServiceImpl;
 import com.lawencon.santuyminimarket.service.impl.SellerServiceImpl;
 import com.lawencon.santuyminimarket.util.ScannerUtil;
@@ -28,8 +30,12 @@ public class MainView {
 		 final int accountCheck = loginService.login(username, password);
 		 
 		 if(accountCheck ==1) {
-			 final BuyerView buyerView = new BuyerView();
-			 System.out.println("welcome pembeli");
+			 final BuyerService buyerService= new BuyerServiceImpl();
+			 final BuyerView buyerView = new BuyerView(buyerService,this);
+			 buyerView.setCategories(categories);
+			 buyerView.setHistories(histories);
+			 buyerView.setItems(items);
+			 
 		 }
 		 else if(accountCheck==2) {
 			 final SellerService sellerService = new SellerServiceImpl();
