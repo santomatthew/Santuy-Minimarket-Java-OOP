@@ -80,6 +80,17 @@ public class BuyerServiceImpl implements BuyerService{
 		
 		return grandTotal;
 	}
+
+	@Override
+	public int getItemFieldByName(List<Item> items, String name) {
+		int takeField =0;
+		for(int i=0;i<items.size();i++) {
+			if(items.get(i).getItemName().equals(name)) {
+				takeField =i;
+			}
+		}
+		return takeField;
+	}
 	
 	
 	

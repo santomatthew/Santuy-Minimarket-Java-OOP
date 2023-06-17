@@ -14,5 +14,6 @@ public interface BuyerService {
 	int takeField(List<Cart> carts, String name);
 	int getMaximumStocks (List<Item>items, String name);
 	int getGrandTotal (List<Cart> cart);
+	int getItemFieldByName (List<Item>items, String name);
 	
 }

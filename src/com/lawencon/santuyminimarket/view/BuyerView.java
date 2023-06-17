@@ -175,7 +175,7 @@ public class BuyerView {
 			System.out.println("3. Checkout");
 			System.out.println("4. Kembali");
 			
-			final int cartMenu = ScannerUtil.scannerInt("Pilih menu :", 1, 3);
+			final int cartMenu = ScannerUtil.scannerInt("Pilih menu :", 1, 4);
 			cardOptionMenu(cartMenu);
 		}
 	}
@@ -197,37 +197,56 @@ public class BuyerView {
 	
 	
 	private void showUpdateQty() {
-		printCart();
-		final int chooseItem = ScannerUtil.scannerInt("Pilih item yang mau diganti quantity : ", 1, carts.size());
-		final int newQty = ScannerUtil.scannerNoMaximum("Masukkan quantity baru = ", 1);
-		final Cart updatedCart = carts.get(chooseItem-1);
-		if(updatedCart.getQuantity()> newQty) {
-			final int giveBackStock = updatedCart.getQuantity()- newQty;
-			final Cart updateNewCart = carts.get(chooseItem-1);
-			updateNewCart.setQuantity(updateNewCart.getQuantity()+ giveBackStock);
-			updateNewCart.setQuantity(newQty);
-			carts.set(chooseItem-1, updateNewCart);
-		}else if(updatedCart.getQuantity()< newQty){
-			final int takeStock = newQty - updatedCart.getQuantity();
-			final int stocks = buyerService.getMaximumStocks(items, carts.get(chooseItem-1).getItemName());
-			if(stocks >= takeStock) {
-				carts.set(chooseItem-1, updatedCart);
-				System.out.println("Update berhasil");
+		if(carts.size()==0) {
+			System.out.println("Tidak ada barang dalam keranjang");
+			show();
+		}
+		else {
+			printCart();
+			final int chooseItem = ScannerUtil.scannerInt("Pilih item yang mau diganti quantity : ", 1, carts.size());
+			final int newQty = ScannerUtil.scannerNoMaximum("Masukkan quantity baru = ", 1);
+			final Cart updatedCart = carts.get(chooseItem-1);
+			if(updatedCart.getQuantity()> newQty) {
+				final int giveBackStock = updatedCart.getQuantity()- newQty;
+				final Cart updateNewCart = carts.get(chooseItem-1);
+				updateNewCart.setQuantity(newQty);
+				final int takeField = buyerService.getItemFieldByName(items, updatedCart.getItemName());
+				
+				// Update Stocks
+				final Item updateItemStocks = items.get(takeField);
+				updateItemStocks.setStocks(updateItemStocks.getStocks() + giveBackStock);
+				items.set(takeField, updateItemStocks);
+				carts.set(chooseItem-1, updateNewCart);
+				
+			}else if(updatedCart.getQuantity()< newQty){
+				final int takeStock = newQty - updatedCart.getQuantity();
+				final int stocks = buyerService.getMaximumStocks(items, carts.get(chooseItem-1).getItemName());
+				if(stocks >= takeStock) {
+					carts.set(chooseItem-1, updatedCart);
+					System.out.println("Update berhasil");
+				}
+				else {
+					System.out.println("Tidak bisa mengupdate quantity yang melebihi stok");
+				}
 			}
-			else {
-				System.out.println("Tidak bisa mengupdate quantity yang melebihi stok");
-			}
-			
 			showCart();
 		}
+		
+		
 		
 	}
 	
 	private void showRemovePartial() {
 		printCart();
 		final int chooseToRemove = ScannerUtil.scannerInt("Pilih item yang mau dihapus : ", 1, carts.size());
+		final Cart giveBackStocks = carts.get(chooseToRemove-1);
+		final int takeField = buyerService.getItemFieldByName(items, giveBackStocks.getItemName());
+		final Item updateStockItem = items.get(takeField);
+		updateStockItem.setStocks(updateStockItem.getStocks() + giveBackStocks.getQuantity());
+		items.set(takeField, updateStockItem);
 		carts.remove(chooseToRemove-1);
 		System.out.println("Item berhasil di hapus");
+		showCart();
 	}
 	
 	private void checkout() {
@@ -237,7 +256,8 @@ public class BuyerView {
 		History history = new History();
 		history.setCodeInv(invCode);
 		history.setGrandTotal(grandTotal);
-		
+		histories.add(history);
+		carts.clear();
 		System.out.println("Checkout berhasil");
 		show();
 	}
