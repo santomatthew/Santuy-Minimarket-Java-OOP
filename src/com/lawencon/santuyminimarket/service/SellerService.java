@@ -13,5 +13,5 @@ public interface SellerService {
 	int getItemFieldByName (List<Item>items, String name);
 	List<Category> getNewCategory(List<Category>categories, String categoryName);
 	Category getCategoryById(List<Category> categories, int categoryId);
-	
+	boolean checkIfCategoryIdUsed(List<Category> categories, int newCategoryId);
 }

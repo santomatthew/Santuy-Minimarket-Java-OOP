@@ -3,7 +3,6 @@ package com.lawencon.santuyminimarket.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lawencon.santuyminimarket.constant.Account;
 import com.lawencon.santuyminimarket.model.Category;
 import com.lawencon.santuyminimarket.model.History;
 import com.lawencon.santuyminimarket.model.Item;

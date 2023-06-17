@@ -12,5 +12,7 @@ public interface BuyerService {
 	Category getCategoryById(List<Category> categories, int categoryId);
 	boolean checkItem(List<Cart> carts, String name);
 	int takeField(List<Cart> carts, String name);
+	int getMaximumStocks (List<Item>items, String name);
+	int getGrandTotal (List<Cart> cart);
 	
 }

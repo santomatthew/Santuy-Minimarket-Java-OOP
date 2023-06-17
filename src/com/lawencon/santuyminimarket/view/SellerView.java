@@ -1,8 +1,6 @@
 package com.lawencon.santuyminimarket.view;
 
-import java.util.ArrayList;
 import java.util.List;
-import com.lawencon.santuyminimarket.model.Cart;
 import com.lawencon.santuyminimarket.model.Category;
 import com.lawencon.santuyminimarket.model.History;
 import com.lawencon.santuyminimarket.model.Item;
@@ -69,7 +67,7 @@ public class SellerView {
 		else {
 			System.out.println("===== List Kategori Santuy Minimarket =====");
 			for(int i=0;i<categories.size();i++) {
-				System.out.println((i+1)+ ". "+ categories.get(i).getCategoryName());
+				System.out.println((i+1)+ ". "+ categories.get(i).getCategoryName() + " || Category Id : "+ categories.get(i).getCategoryId());
 			}
 			System.out.println("===== List Kategori Santuy Minimarket =====");
 		}
@@ -109,12 +107,7 @@ public class SellerView {
 	private void showAddCategory() {
 		final String categoryName = ScannerUtil.scannerStr("Masukkan nama kategori : ");
 		final int categoryId = ScannerUtil.scannerNoMaximum("Masukkan id kategori : ", 1);
-		final boolean categoryChecker = sellerService.checkCategoryIfExist(categories, categoryName);
-		if(categoryChecker) {
-			System.out.println("Nama kategori sudah ada, silahkan menambahkan yang baru");
-			showAddCategory();
-		}
-		else {
+		if(categories.size()==0) {
 			final Category newCategory = new Category();
 			newCategory.setCategoryName(categoryName);
 			newCategory.setCategoryId(categoryId);
@@ -124,6 +117,32 @@ public class SellerView {
 			System.out.println("==== Response ====");
 			showCategoryMenu();
 		}
+		else {
+			final boolean categoryIdChecker = sellerService.checkIfCategoryIdUsed(categories, categoryId);
+			if(!categoryIdChecker) {
+				final boolean categoryChecker = sellerService.checkCategoryIfExist(categories, categoryName);
+				if(categoryChecker) {
+					System.out.println("Nama kategori sudah ada, silahkan menambahkan yang baru");
+					showAddCategory();
+				}
+				else {
+					final Category newCategory = new Category();
+					newCategory.setCategoryName(categoryName);
+					newCategory.setCategoryId(categoryId);
+					categories.add(newCategory);
+					System.out.println("==== Response ====");
+					System.out.println("System res: (Sukses menambahkan kategori "+ categoryName+")");
+					System.out.println("==== Response ====");
+					showCategoryMenu();
+				}
+			}
+			else {
+				System.out.println("Id kategori sudah terpakai, mohon ganti yang baru");
+				showAddCategory();
+			}
+		}
+		
+		
 	}
 	
 	//Remove Category
@@ -136,10 +155,18 @@ public class SellerView {
 		else {
 			showCategories();
 			final int chosenCategory = ScannerUtil.scannerInt("Pilih kategori yang mau dihapus : ", 1, categories.size());
-			categories.remove(chosenCategory-1);
-			System.out.println("==== Response ====");
-			System.out.println("System res: (Kategori berhasil di hapus)");
-			System.out.println("==== Response ====");
+			boolean checkItemInCategory = sellerService.checkItemCategory(items, categories.get(chosenCategory-1).getCategoryId());
+			if(checkItemInCategory) {
+				System.out.println("Masih ada item yang dijual di kategori ini, hapus item terlebih dahulu sebelum menghapus kategori");
+			}
+			else {
+				categories.remove(chosenCategory-1);
+				System.out.println("==== Response ====");
+				System.out.println("System res: (Kategori berhasil di hapus)");
+				System.out.println("==== Response ====");
+			}
+			
+			
 		}
 		showCategoryMenu();
 	}

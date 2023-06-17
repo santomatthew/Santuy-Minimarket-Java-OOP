@@ -8,6 +8,7 @@ import com.lawencon.santuyminimarket.model.Category;
 import com.lawencon.santuyminimarket.model.History;
 import com.lawencon.santuyminimarket.model.Item;
 import com.lawencon.santuyminimarket.service.BuyerService;
+import com.lawencon.santuyminimarket.util.GenerateUtil;
 import com.lawencon.santuyminimarket.util.ScannerUtil;
 
 public class BuyerView {
@@ -53,17 +54,18 @@ public class BuyerView {
 	private void menuOption(int menuCode) {
 		if(menuCode==1) {
 			showHistory();
+			show();
 		}
-		if(menuCode==2) {
+		else if(menuCode==2) {
 			showCategoryList();
 		}
-		if(menuCode==3) {
+		else if(menuCode==3) {
 			showCart();
 		}
-		if(menuCode==4) {
+		else if(menuCode==4) {
 			mainView.show();
 		}
-		if(menuCode==5) {
+		else if(menuCode==5) {
 			System.out.println("Anda keluar aplikasi");
 		}
 		
@@ -71,13 +73,16 @@ public class BuyerView {
 	
 	//Show History
 	private void showHistory() {
-		
+		for(int i=0;i<histories.size();i++) {
+			System.out.println((i+1)+ ". Inv Code : "+ histories.get(i).getCodeInv() + " Grand Total : Rp." +histories.get(i).getGrandTotal());
+		}
 	}
 	
 	//Show Category List
 	private void showCategoryList() {
 		if(categories.size()==0) {
 			System.out.println("Kategori Belum ada");
+			show();
 		}
 		else {
 			System.out.println("===== List Kategori Santuy Minimarket =====");
@@ -102,55 +107,142 @@ public class BuyerView {
 		else {
 			System.out.println("===== List Item Kategori "+ category.getCategoryName() +" =====");
 			for(int i=0;i<itemsByCategory.size();i++) {
-				System.out.println((i+1)+". "+ itemsByCategory.get(i).getItemName());
+				System.out.println((i+1)+". "+ itemsByCategory.get(i).getItemName()+ " || Stocks : "+ items.get(i).getStocks());
 			}
 			
 			final int chosenItem =  ScannerUtil.scannerInt("Pilih item :", 1, itemsByCategory.size());
 			final int quantity = ScannerUtil.scannerNoMaximum("Masukkan Quantity: ", 1);
-			final String itemName= items.get(chosenItem-1).getItemName();
+			final Item chosen= items.get(chosenItem-1);
 			Cart cart = new Cart();
-			final boolean checkItem = buyerService.checkItem(carts, itemName);
-			if(checkItem) {
-				final int takeField = buyerService.takeField(carts, itemName);
-				cart = carts.get(takeField);
-				cart.setQuantity(cart.getQuantity()+ quantity);
-				carts.set(takeField, cart);
-				System.out.println("Berhasil menambah "+quantity+" "+ itemName );
+			if(items.get(chosenItem-1).getStocks()>=quantity) {
+				final boolean checkItem = buyerService.checkItem(carts, chosen.getItemName());
+				if(checkItem) {
+					final int takeField = buyerService.takeField(carts, chosen.getItemName());
+					cart = carts.get(takeField);
+					if(chosen.getStocks()>=  quantity) {
+						chosen.setStocks(chosen.getStocks() -  quantity);
+						items.set(chosenItem-1, chosen);
+						cart.setQuantity(cart.getQuantity()+ quantity);
+						carts.set(takeField, cart);
+						System.out.println("Berhasil menambah "+quantity+" "+ chosen.getItemName() );
+					}
+					else {
+						System.out.println("Stok tidak cukup");
+						showItemsByCategory(categoryId);
+					}
+				}
+				else {
+					cart.setItemName(itemsByCategory.get(chosenItem-1).getItemName());
+					cart.setCategoryName(category.getCategoryName());
+					cart.setPrice(itemsByCategory.get(chosenItem-1).getPrice());
+					chosen.setStocks(chosen.getStocks() - quantity);
+					items.set(chosenItem-1, chosen);
+					cart.setQuantity(quantity);
+					carts.add(cart);
+					System.out.println("Berhasil membeli "+quantity+" "+ chosen.getItemName() );
+				}
 			}
 			else {
-				cart.setItemName(itemsByCategory.get(chosenItem-1).getItemName());
-				cart.setCategoryName(category.getCategoryName());
-				cart.setPrice(itemsByCategory.get(chosenItem-1).getPrice());
-				cart.setQuantity(quantity);
-				carts.add(cart);
-				System.out.println("Berhasil membeli "+quantity+" "+ itemName );
+				System.out.println("Quantity tidak bisa melebihi stok");
+				showItemsByCategory(categoryId);
 			}
-			
 		}
 		show();
 		
+	}
+	
+	private void printCart() {
+		System.out.println("===== Keranjang =====");
+		for(int i=0;i<carts.size();i++) {
+			System.out.println((i+1)+". "
+					+ carts.get(i).getItemName()
+					+ " Quantity : "+ carts.get(i).getQuantity()
+					+ " Price : Rp. "+ carts.get(i).getPrice());
+		}
+		System.out.println("===== Keranjang =====");
 	}
 	
 	//Show Cart
 	private void showCart() {
 		if(carts.size()==0) {
 			System.out.println("Keranjang anda masih kosong, silahkan membeli barang terlebih dahulu");
+			show();
 		}
 		else {
-			System.out.println("===== Keranjang =====");
-			for(int i=0;i<carts.size();i++) {
-				System.out.println((i+1)+". "
-						+ carts.get(i).getItemName()
-						+ " Quantity : "+ carts.get(i).getQuantity()
-						+ " Price : Rp. "+ carts.get(i).getPrice());
-			}
-			System.out.println("===== Keranjang =====");
-		
-		System.out.println("1. Update Quantity");
-		System.out.println("2. Hapus Sebagian Belanjaan");
-		System.out.println("3. Kembali");
+			printCart();
+			System.out.println("1. Update Quantity");
+			System.out.println("2. Hapus Sebagian Belanjaan");
+			System.out.println("3. Checkout");
+			System.out.println("4. Kembali");
+			
+			final int cartMenu = ScannerUtil.scannerInt("Pilih menu :", 1, 3);
+			cardOptionMenu(cartMenu);
 		}
 	}
+	
+	private void cardOptionMenu(int chosen) {
+		if(chosen==1) {
+			showUpdateQty();
+		}
+		else if(chosen==2) {
+			showRemovePartial();
+		}
+		else if(chosen==3) {
+			checkout();
+		}
+		else if(chosen==4) {
+			show();
+		}
+	}
+	
+	
+	private void showUpdateQty() {
+		printCart();
+		final int chooseItem = ScannerUtil.scannerInt("Pilih item yang mau diganti quantity : ", 1, carts.size());
+		final int newQty = ScannerUtil.scannerNoMaximum("Masukkan quantity baru = ", 1);
+		final Cart updatedCart = carts.get(chooseItem-1);
+		if(updatedCart.getQuantity()> newQty) {
+			final int giveBackStock = updatedCart.getQuantity()- newQty;
+			final Cart updateNewCart = carts.get(chooseItem-1);
+			updateNewCart.setQuantity(updateNewCart.getQuantity()+ giveBackStock);
+			updateNewCart.setQuantity(newQty);
+			carts.set(chooseItem-1, updateNewCart);
+		}else if(updatedCart.getQuantity()< newQty){
+			final int takeStock = newQty - updatedCart.getQuantity();
+			final int stocks = buyerService.getMaximumStocks(items, carts.get(chooseItem-1).getItemName());
+			if(stocks >= takeStock) {
+				carts.set(chooseItem-1, updatedCart);
+				System.out.println("Update berhasil");
+			}
+			else {
+				System.out.println("Tidak bisa mengupdate quantity yang melebihi stok");
+			}
+			
+			showCart();
+		}
+		
+	}
+	
+	private void showRemovePartial() {
+		printCart();
+		final int chooseToRemove = ScannerUtil.scannerInt("Pilih item yang mau dihapus : ", 1, carts.size());
+		carts.remove(chooseToRemove-1);
+		System.out.println("Item berhasil di hapus");
+	}
+	
+	private void checkout() {
+		final int grandTotal = buyerService.getGrandTotal(carts);
+		final String invCode = GenerateUtil.generateRandom();
+		
+		History history = new History();
+		history.setCodeInv(invCode);
+		history.setGrandTotal(grandTotal);
+		
+		System.out.println("Checkout berhasil");
+		show();
+	}
+	
+	
 	
 	
 	

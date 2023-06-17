@@ -81,4 +81,16 @@ public class SellerServiceImpl implements SellerService{
 		return chosenCategory;
 	}
 
+	@Override
+	public boolean checkIfCategoryIdUsed(List<Category> categories, int newCategoryId) {
+		boolean result = false;
+		for(int i=0;i<categories.size();i++) {
+			if(categories.get(i).getCategoryId() == newCategoryId) {
+				result = true;
+			}
+		}
+		
+		return result;
+	}
+
 }

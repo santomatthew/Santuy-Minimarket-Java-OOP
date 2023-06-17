@@ -57,7 +57,30 @@ public class BuyerServiceImpl implements BuyerService{
 		return takeField;
 	}
 
+	@Override
+	public int getMaximumStocks(List<Item> items, String name) {
+		int maximumStocks = 0;
+		for(int i=0;i<items.size();i++) {
+			if(items.get(i).getItemName().equals(name)) {
+				maximumStocks = items.get(i).getStocks();
+			}
+		}
+		
+		return maximumStocks;
+		
+	}
 
+	@Override
+	public int getGrandTotal(List<Cart> cart) {
+		int grandTotal = 0;
+		
+		for(int i=0;i<cart.size();i++) {
+			grandTotal += cart.get(i).getQuantity() * cart.get(i).getPrice();
+		}
+		
+		return grandTotal;
+	}
+	
 	
 	
 }
