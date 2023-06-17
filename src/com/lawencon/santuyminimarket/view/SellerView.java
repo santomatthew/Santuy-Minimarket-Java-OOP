@@ -11,7 +11,7 @@ import com.lawencon.santuyminimarket.util.ScannerUtil;
 
 public class SellerView {
 
-	private final List<Cart> carts = new ArrayList<Cart>();
+
 	private final SellerService sellerService ;
 	
 	

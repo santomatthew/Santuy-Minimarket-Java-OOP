@@ -16,7 +16,7 @@ public class LoginServiceImpl implements LoginService{
 		else if(accounts[1].username.equals(username) && accounts[1].password.equals(password)) {
 			result=2;
 		}
-		
+		System.out.println("result = "+result);
 		return result;
 	}	
 }

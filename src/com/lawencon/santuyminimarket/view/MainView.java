@@ -35,6 +35,7 @@ public class MainView {
 			 buyerView.setCategories(categories);
 			 buyerView.setHistories(histories);
 			 buyerView.setItems(items);
+			 buyerView.show();
 			 
 		 }
 		 else if(accountCheck==2) {
