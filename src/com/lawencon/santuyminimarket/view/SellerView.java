@@ -153,7 +153,7 @@ public class SellerView {
 		else {
 			showCategories();
 			final int chosenCategory = ScannerUtil.scannerInt("Pilih kategori yang mau dihapus : ", 1, categories.size());
-			boolean checkItemInCategory = sellerService.checkItemCategory(items, categories.get(chosenCategory-1).getCategoryId());
+			final boolean checkItemInCategory = sellerService.checkItemCategory(items, categories.get(chosenCategory-1).getCategoryId());
 			if(checkItemInCategory) {
 				System.out.println("==== Response ====");
 				System.out.println("System res: (Masih ada item yang dijual di kategori ini, hapus item terlebih dahulu sebelum menghapus kategori)");

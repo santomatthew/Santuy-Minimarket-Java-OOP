@@ -73,9 +73,12 @@ public class BuyerView {
 	
 	//Show History
 	private void showHistory() {
+		
+		System.out.println("===== History =====");
 		for(int i=0;i<histories.size();i++) {
 			System.out.println((i+1)+ ". Inv Code : "+ histories.get(i).getCodeInv() + " Grand Total : Rp." +histories.get(i).getGrandTotal());
 		}
+		System.out.println("===== History =====");
 	}
 	
 	//Show Category List
@@ -161,6 +164,8 @@ public class BuyerView {
 					+ " Quantity : "+ carts.get(i).getQuantity()
 					+ " Price : Rp. "+ carts.get(i).getPrice());
 		}
+		final int grandTotal = buyerService.getGrandTotal(carts);
+		System.out.println("Grand Total = Rp. "+ grandTotal);
 		System.out.println("===== Keranjang =====");
 	}
 	
@@ -212,6 +217,7 @@ public class BuyerView {
 				final int giveBackStock = updatedCart.getQuantity()- newQty;
 				final Cart updateNewCart = carts.get(chooseItem-1);
 				updateNewCart.setQuantity(newQty);
+				carts.set(chooseItem-1, updateNewCart);
 				final int takeField = buyerService.getItemFieldByName(items, updatedCart.getItemName());
 				
 				// Update Stocks
@@ -224,6 +230,10 @@ public class BuyerView {
 				final int takeStock = newQty - updatedCart.getQuantity();
 				final int stocks = buyerService.getMaximumStocks(items, carts.get(chooseItem-1).getItemName());
 				if(stocks >= takeStock) {
+					updatedCart.setQuantity(newQty);
+					final int takeField = buyerService.getItemFieldByName(items, updatedCart.getItemName());
+					final Item updateItemStocks = items.get(takeField);
+					updateItemStocks.setStocks(stocks-takeStock);
 					carts.set(chooseItem-1, updatedCart);
 					System.out.println("Update berhasil");
 				}
@@ -255,7 +265,7 @@ public class BuyerView {
 		final int grandTotal = buyerService.getGrandTotal(carts);
 		final String invCode = GenerateUtil.generateRandom();
 		
-		History history = new History();
+		final History history = new History();
 		history.setCodeInv(invCode);
 		history.setGrandTotal(grandTotal);
 		histories.add(history);
